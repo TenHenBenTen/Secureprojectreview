@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification Required</title>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#0f172a;
+  font-family:sans-serif;
+}
+.box{
+  background:#1e293b;
+  padding:40px;
+  border-radius:12px;
+  width:320px;
+  color:white;
+  text-align:center;
+}
+button{
+  margin-top:20px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:6px;
+  background:#3b82f6;
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="box">
+<h3>Human Verification Required</h3>
+
+<form method="POST" action="/.netlify/functions/verify">
+
+<!-- Honeypot field to trap bots -->
+<input type="text" name="company" style="display:none">
+
+<div class="cf-turnstile"
+     data-sitekey="0x4AAAAAACj6-s9lD1Ds2BgN">
+</div>
+
+<button type="submit">Continue</button>
+
+</form>
+</div>
+</body>
+</html>
