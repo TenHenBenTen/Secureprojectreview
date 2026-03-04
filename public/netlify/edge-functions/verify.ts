@@ -13,7 +13,7 @@ export default async (request: Request) => {
 
   // Verify Turnstile with Cloudflare
   const formData = new URLSearchParams();
-  formData.append("secret", Deno.env.get("TURNSTILE_SECRET_KEY")!);
+  formData.append("secret", Deno.env.get("TURNSTILE_SECRETKEY")!);
   formData.append("response", token);
 
   const verify = await fetch(
@@ -38,7 +38,7 @@ export default async (request: Request) => {
   }
 
   return Response.redirect(
-    Deno.env.get("REAL_REDIRECT_URL")!,
+    Deno.env.get("REAL_REDIRECTURL")!,
     302
   );
 };
