@@ -1,0 +1,6 @@
+[build]
+  publish = "public"  # This tells Netlify to use the 'public' directory for the site files.
+
+[[edge_functions]]
+  function = "verify"  # This is the name of the Edge Function file (without the extension).
+  path = "/verify"     # This defines the path to trigger the Edge Function.
