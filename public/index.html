@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Access</title>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <style>
+    body { text-align:center; font-family:Arial; margin-top:100px; }
+    .hidden-field { display:none; }
+  </style>
+</head>
+<body>
+
+<h2>Verifying your browser...</h2>
+
+<!-- Honeypot -->
+<form id="trap-form">
+  <input type="text" name="company" class="hidden-field" autocomplete="off">
+</form>
+
+<!-- Turnstile -->
+<div class="cf-turnstile"
+     data-sitekey="YOUR_TURNSTILE_SITE_KEY"
+     data-callback="onTurnstileSuccess">
+</div>
+
+<script>
+let mouseMoved = false;
+let scrolled = false;
+let startTime = Date.now();
+let turnstileToken = null;
+
+// Behavior tracking
+document.addEventListener("mousemove", () => mouseMoved = true);
+document.addEventListener("scroll", () => scrolled = true);
+
+function onTurnstileSuccess(token) {
+  turnstileToken = token;
+  validateUser();
+}
+
+async function validateUser() {
+
+  const timeSpent = (Date.now() - startTime) / 1000;
+  const honeypotValue = document.querySelector('input[name="company"]').value;
+
+  // Basic checks
+  if (!mouseMoved || timeSpent < 3) return;
+  if (honeypotValue !== "") return;
+  if (!turnstileToken) return;
+
+  const res = await fetch("/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: turnstileToken })
+  });
+
+  if (res.redirected) {
+    window.location.href = res.url;
+  }
+}
+</script>
+
+</body>
+</html>
