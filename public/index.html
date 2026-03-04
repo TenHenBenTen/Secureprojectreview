@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Redirect</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    body { text-align:center; font-family: Arial, sans-serif; margin-top:50px; }
+    .hidden-field { display:none; }
+  </style>
+</head>
+<body>
+
+<h2>Please verify you're human...</h2>
+
+<!-- Honeypot Field -->
+<form id="trap-form">
+  <input type="text" name="company" class="hidden-field" autocomplete="off">
+</form>
+
+<!-- Turnstile CAPTCHA -->
+<div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY" data-callback="onTurnstileSuccess"></div>
+
+<script>
+let mouseMoved = false;
+let timeSpent = 0;
+let turnstileToken = null;
+const startTime = Date.now();
+
+// Track mouse movements
+document.addEventListener("mousemove", () => mouseMoved = true);
+
+// Check time spent on the page (validate real user)
+setInterval(() => {
+  timeSpent = (Date.now() - startTime) / 1000;
+}, 1000);
+
+// Turnstile success callback
+function onTurnstileSuccess(token) {
+  turnstileToken = token;
+  validateUser();
+}
+
+// Validate user interactions
+async function validateUser() {
+  const honeypotValue = document.querySelector('input[name="company"]').value;
+
+  // If honeypot is filled, it's a bot
+  if (honeypotValue !== "") return;
+
+  // If time spent is too short or mouse was not moved, block
+  if (timeSpent < 3 || !mouseMoved || !turnstileToken) return;
+
+  const response = await fetch("/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: turnstileToken })
+  });
+
+  if (response.redirected) {
+    window.location.href = response.url;
+  } else {
+    alert("Verification failed.");
+  }
+}
+</script>
+
+</body>
+</html>
